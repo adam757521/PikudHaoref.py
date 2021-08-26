@@ -5,6 +5,7 @@ README = f.read()
 
 setup(
     name='pikudhaoref.py',
+    packages=['pikudhaoref'],
     version='0.0.2',
     license='MIT',
     description="An API wrapper for Pikud Haoref's unofficial rocket API.",
@@ -12,7 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     author='adam7100',
     url='https://github.com/adam757521/PikudHaoref.py',
-    download_url='https://github.com/adam757521/PikudHaoref.py/archive/refs/tags/v0.0.2.tar.gz',
+    download_url='https://github.com/adam757521/PikudHaoref.py/archive/refs/tags/v0.0.3.tar.gz',
     keywords=['rocket', 'siren', 'pikudhaoref', 'api', 'wrapper', 'python'],
     install_requires=[
         'requests',
