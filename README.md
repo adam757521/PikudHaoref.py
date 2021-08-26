@@ -54,6 +54,12 @@ def on_siren_end(sirens):
     print(f"Sirens {sirens} have ended.")
 ```
 
+TODO
+--------------
+
+- Add multi language support.
+- Add another version of history command.
+
 Known Issues
 --------------
 
