@@ -6,7 +6,7 @@ README = f.read()
 setup(
     name='pikudhaoref.py',
     packages=['pikudhaoref'],
-    version='0.0.2',
+    version='0.0.3',
     license='MIT',
     description="An API wrapper for Pikud Haoref's unofficial rocket API.",
     long_description=README,
