@@ -60,7 +60,7 @@ TODO
 --------------
 
 - Add multi language support.
-- Add another version of history command.
+- Add another version of history.
 
 Known Issues
 --------------
