@@ -26,7 +26,7 @@ Features
 Installation
 --------------
 
-Installing discordSuperUtils is very easy.
+Installing pikudhaoref.py is very easy.
 
 ```sh
 python -m pip install pikudhaoref.py
