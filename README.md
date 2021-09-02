@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-   An API wrapper for Pikud Haoref's unofficial rocket API written in python.
+   An unofficial API wrapper for Pikud Haoref's rocket API written in python.
    <br></br>
   <b>The documentation is not done yet.</b>
 </p>
