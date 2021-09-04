@@ -61,6 +61,7 @@ TODO
 
 - Add multi language support.
 - Add another version of history.
+- Add async support.
 
 Known Issues
 --------------
