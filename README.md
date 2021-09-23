@@ -10,7 +10,9 @@
 </p>
 
 <p align="center">
-   An API wrapper for Pikud Haoref's unofficial rocket API written in python.
+   An unofficial API wrapper for Pikud Haoref's rocket API written in python.
+   <br></br>
+  <b>The documentation is not done yet.</b>
 </p>
 
 Features
@@ -24,7 +26,7 @@ Features
 Installation
 --------------
 
-Installing discordSuperUtils is very easy.
+Installing pikudhaoref.py is very easy.
 
 ```sh
 python -m pip install pikudhaoref.py
@@ -58,7 +60,8 @@ TODO
 --------------
 
 - Add multi language support.
-- Add another version of history command.
+- Add another version of history.
+- Add async support.
 
 Known Issues
 --------------
