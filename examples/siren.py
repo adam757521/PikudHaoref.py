@@ -1,9 +1,9 @@
 import pikudhaoref
 
 
-client = pikudhaoref.Client(update_interval=2)
-print(client.history())  # client.history returns sirens that happened in the last 24 hours.
-print(client.get_current_sirens())  # Returns the current sirens
+client = pikudhaoref.SyncClient(update_interval=2)
+print(client.history)
+print(client.current_sirens)
 
 
 @client.event()

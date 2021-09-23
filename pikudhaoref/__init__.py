@@ -1,4 +1,4 @@
-from .client import Client
+from .client import SyncClient, ASyncClient
 
 __title__ = "pikudhaoref"
 __version__ = "0.0.3"
