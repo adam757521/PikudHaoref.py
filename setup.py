@@ -17,6 +17,8 @@ setup(
     keywords=["rocket", "siren", "pikudhaoref", "api", "wrapper", "python"],
     install_requires=[
         "requests",
+        "aiohttp",
+        "pytz",
     ],
     classifiers=[  # Optional
         # How mature is this project? Common values are
