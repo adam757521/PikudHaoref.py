@@ -4,7 +4,6 @@ import requests
 import json
 import aiohttp
 import asyncio
-from .siren import Siren
 
 
 __all__ = ("HTTPClient", "SyncHTTPClient", "ASyncHTTPClient")
