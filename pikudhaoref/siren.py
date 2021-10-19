@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 
 import pytz
@@ -10,22 +11,14 @@ from .city import City
 __all__ = ("Siren",)
 
 
+@dataclass
 class Siren:
     """
     Represents a siren.
     """
 
-    __slots__ = ("city", "datetime")
-
-    def __init__(self, city: City, datetime_: datetime):
-        self.datetime = datetime_
-        self.city = city
-
-    def __str__(self):
-        return f"<{self.__class__.__name__} city={self.city}>"
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__} city={self.city}, datetime={self.datetime}>"
+    city: City
+    datetime: datetime
 
     @classmethod
     def from_raw(cls, raw: Dict[str, str]) -> Siren:
