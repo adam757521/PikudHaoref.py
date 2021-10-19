@@ -4,6 +4,7 @@ from datetime import datetime
 from threading import Thread
 from typing import Union, List
 
+from .city import City
 from .base import EventManager
 from .http import SyncHTTPClient, ASyncHTTPClient
 from .siren import Siren
@@ -46,9 +47,7 @@ class SyncClient(EventManager):
 
     @property
     def current_sirens(self) -> List[Siren]:
-        sirens = self.http.get_current_sirens()
-
-        return [Siren(x, datetime.utcnow()) for x in sirens]
+        return [Siren(City.from_city_name(x), datetime.utcnow()) for x in self.http.get_current_sirens()]
 
     def _handle_sirens(self):
         while not self.closed:
@@ -105,9 +104,9 @@ class ASyncClient(EventManager):
         return [Siren.from_raw(x) for x in await self.http.get_history()]
 
     async def current_sirens(self) -> List[Siren]:
-        sirens = await self.http.get_current_sirens()
-
-        return [Siren(x, datetime.utcnow()) for x in sirens]
+        return [
+            Siren(City.from_city_name(x), datetime.utcnow()) for x in await self.http.get_current_sirens()
+        ]
 
     async def _handle_sirens(self):
         while not self.closed:

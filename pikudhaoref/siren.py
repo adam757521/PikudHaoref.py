@@ -5,6 +5,8 @@ from datetime import datetime
 import pytz
 from typing import Dict
 
+from .city import City
+
 __all__ = ("Siren",)
 
 
@@ -15,7 +17,7 @@ class Siren:
 
     __slots__ = ("city", "datetime")
 
-    def __init__(self, city: str, datetime_: datetime):
+    def __init__(self, city: City, datetime_: datetime):
         self.datetime = datetime_
         self.city = city
 
@@ -38,4 +40,7 @@ class Siren:
         israel_timezone = pytz.timezone("Israel")
         date = datetime.strptime(raw["alertDate"], "%Y-%m-%d %H:%M:%S")
 
-        return cls(raw["data"], israel_timezone.localize(date).astimezone(pytz.utc))
+        return cls(
+            City.from_city_name(raw["data"]),
+            israel_timezone.localize(date).astimezone(pytz.utc),
+        )
