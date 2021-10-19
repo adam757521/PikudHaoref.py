@@ -47,7 +47,10 @@ class SyncClient(EventManager):
 
     @property
     def current_sirens(self) -> List[Siren]:
-        return [Siren(City.from_city_name(x), datetime.utcnow()) for x in self.http.get_current_sirens()]
+        return [
+            Siren(City.from_city_name(x), datetime.utcnow())
+            for x in self.http.get_current_sirens()
+        ]
 
     def _handle_sirens(self):
         while not self.closed:
@@ -105,7 +108,8 @@ class ASyncClient(EventManager):
 
     async def current_sirens(self) -> List[Siren]:
         return [
-            Siren(City.from_city_name(x), datetime.utcnow()) for x in await self.http.get_current_sirens()
+            Siren(City.from_city_name(x), datetime.utcnow())
+            for x in await self.http.get_current_sirens()
         ]
 
     async def _handle_sirens(self):

@@ -78,10 +78,8 @@ class City:
             None,
         )
 
-        if not city_dict:
-            return
-
-        return cls.from_dict(city_dict)
+        if city_dict:
+            return cls.from_dict(city_dict)
 
     @classmethod
     def from_dict(cls, dictionary: Dict[str, Any]) -> City:
