@@ -1,11 +1,12 @@
 import asyncio
 import time
+from datetime import datetime
 from threading import Thread
 from typing import Union, List
 
 from .base import EventManager
 from .http import SyncHTTPClient, ASyncHTTPClient
-
+from .siren import Siren
 
 __all__ = ("SyncClient", "ASyncClient")
 
@@ -40,12 +41,14 @@ class SyncClient(EventManager):
         self.http.session.close()
 
     @property
-    def history(self) -> List[dict]:
-        return self.http.get_history()
+    def history(self) -> List[Siren]:
+        return [Siren.from_raw(x) for x in self.http.get_history()]
 
     @property
-    def current_sirens(self) -> List[str]:
-        return self.http.get_current_sirens()
+    def current_sirens(self) -> List[Siren]:
+        sirens = self.http.get_current_sirens()
+
+        return [Siren(x, datetime.utcnow()) for x in sirens]
 
     def _handle_sirens(self):
         while not self.closed:
@@ -98,11 +101,13 @@ class ASyncClient(EventManager):
         self.closed = True
         await self.http.session.close()
 
-    async def history(self) -> List[dict]:
-        return await self.http.get_history()
+    async def history(self) -> List[Siren]:
+        return [Siren.from_raw(x) for x in await self.http.get_history()]
 
-    async def current_sirens(self) -> List[str]:
-        return await self.http.get_current_sirens()
+    async def current_sirens(self) -> List[Siren]:
+        sirens = await self.http.get_current_sirens()
+
+        return [Siren(x, datetime.utcnow()) for x in sirens]
 
     async def _handle_sirens(self):
         while not self.closed:

@@ -4,6 +4,7 @@ import requests
 import json
 import aiohttp
 import asyncio
+from .siren import Siren
 
 
 __all__ = ("HTTPClient", "SyncHTTPClient", "ASyncHTTPClient")
@@ -48,11 +49,10 @@ class SyncHTTPClient(HTTPClient):
             "https://www.oref.org.il/WarningMessages/History/AlertsHistory.json"
         ).text
 
-        return (
-            [x for x in json.loads(website_content)]
-            if website_content != "\r\n"
-            else []
-        )
+        if website_content == "\r\n":
+            return []
+
+        return json.loads(website_content)
 
     def get_current_sirens(self) -> List[str]:
         website_content = self.session.get(
@@ -79,11 +79,10 @@ class ASyncHTTPClient(HTTPClient):
 
         website_content = await r.text()
 
-        return (
-            [x for x in json.loads(website_content)]
-            if website_content != "\r\n"
-            else []
-        )
+        if website_content == "\r\n":
+            return []
+
+        return json.loads(website_content)
 
     async def get_current_sirens(self) -> List[str]:
         r = await self.session.get(
