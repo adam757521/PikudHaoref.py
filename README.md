@@ -23,6 +23,8 @@ Features
 - Detect sirens in real time.
 (MORE COMING SOON)
 
+**The pikudhaoref API is only accessible from Israel.**
+
 Installation
 --------------
 
@@ -59,9 +61,7 @@ def on_siren_end(sirens):
 TODO
 --------------
 
-- Add multi language support.
-- Add another version of history.
-- Add async support.
+- None
 
 Known Issues
 --------------
