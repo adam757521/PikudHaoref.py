@@ -43,12 +43,12 @@ class SyncClient(EventManager):
         self.http.session.close()
 
     def get_history(self, mode: HistoryMode = HistoryMode.TODAY) -> List[Siren]:
-        return [Siren.from_raw(x) for x in self.http.get_history(mode.value)]
+        return [Siren.from_raw(x, self.http.city_data) for x in self.http.get_history(mode.value)]
 
     @property
     def current_sirens(self) -> List[Siren]:
         return [
-            Siren(City.from_city_name(x), datetime.utcnow())
+            Siren(City.from_city_name(x, self.http.city_data), datetime.utcnow())
             for x in self.http.get_current_sirens()
         ]
 
@@ -94,6 +94,7 @@ class AsyncClient(EventManager):
         self.update_interval = update_interval
         self._known_sirens = []
 
+        loop.run_until_complete(self.http.initialize_city_data())
         loop.create_task(self._handle_sirens())
 
     async def __aenter__(self):
@@ -104,11 +105,11 @@ class AsyncClient(EventManager):
         await self.http.session.close()
 
     async def get_history(self, mode: HistoryMode = HistoryMode.TODAY) -> List[Siren]:
-        return [Siren.from_raw(x) for x in await self.http.get_history(mode.value)]
+        return [Siren.from_raw(x, self.http.city_data) for x in await self.http.get_history(mode.value)]
 
     async def current_sirens(self) -> List[Siren]:
         return [
-            Siren(City.from_city_name(x), datetime.utcnow())
+            Siren(City.from_city_name(x, self.http.city_data), datetime.utcnow())
             for x in await self.http.get_current_sirens()
         ]
 
