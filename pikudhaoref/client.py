@@ -94,8 +94,10 @@ class AsyncClient(EventManager):
         self.update_interval = update_interval
         self._known_sirens = []
 
-        loop.run_until_complete(self.http.initialize_city_data())
         loop.create_task(self._handle_sirens())
+
+    async def initialize(self):
+        await self.http.initialize_city_data()
 
     async def __aenter__(self):
         return self
@@ -114,6 +116,8 @@ class AsyncClient(EventManager):
         ]
 
     async def _handle_sirens(self):
+        await self.http.initialize_city_data()
+
         while not self.closed:
             await asyncio.sleep(self.update_interval)
             cities = await self.http.get_current_sirens()
