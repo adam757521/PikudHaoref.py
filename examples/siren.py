@@ -2,7 +2,7 @@ import pikudhaoref
 
 
 client = pikudhaoref.SyncClient(update_interval=2)
-print(client.history)
+print(client.get_history())
 print(client.current_sirens)
 
 

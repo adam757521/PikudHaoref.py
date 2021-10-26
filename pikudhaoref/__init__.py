@@ -1,5 +1,6 @@
-from .client import SyncClient, ASyncClient
+from .client import SyncClient, AsyncClient
 from .city import City
+from .enums import HistoryMode
 
 __title__ = "pikudhaoref"
 __version__ = "0.0.3"

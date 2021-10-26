@@ -6,10 +6,11 @@ from typing import Union, List
 
 from .city import City
 from .base import EventManager
-from .http import SyncHTTPClient, ASyncHTTPClient
+from .enums import HistoryMode
+from .http import SyncHTTPClient, AsyncHTTPClient
 from .siren import Siren
 
-__all__ = ("SyncClient", "ASyncClient")
+__all__ = ("SyncClient", "AsyncClient")
 
 
 class SyncClient(EventManager):
@@ -41,9 +42,8 @@ class SyncClient(EventManager):
         self.closed = True
         self.http.session.close()
 
-    @property
-    def history(self) -> List[Siren]:
-        return [Siren.from_raw(x) for x in self.http.get_history()]
+    def get_history(self, mode: HistoryMode = HistoryMode.TODAY) -> List[Siren]:
+        return [Siren.from_raw(x) for x in self.http.get_history(mode.value)]
 
     @property
     def current_sirens(self) -> List[Siren]:
@@ -71,7 +71,7 @@ class SyncClient(EventManager):
                 self._known_sirens = []
 
 
-class ASyncClient(EventManager):
+class AsyncClient(EventManager):
     """
     Represents an async pikudhaoref client.
     """
@@ -89,7 +89,7 @@ class ASyncClient(EventManager):
 
         self.loop = loop or asyncio.get_event_loop()
         self.closed = False
-        self.http = ASyncHTTPClient(loop=loop)
+        self.http = AsyncHTTPClient(loop=loop)
 
         self.update_interval = update_interval
         self._known_sirens = []
@@ -103,8 +103,8 @@ class ASyncClient(EventManager):
         self.closed = True
         await self.http.session.close()
 
-    async def history(self) -> List[Siren]:
-        return [Siren.from_raw(x) for x in await self.http.get_history()]
+    async def get_history(self, mode: HistoryMode = HistoryMode.TODAY) -> List[Siren]:
+        return [Siren.from_raw(x) for x in await self.http.get_history(mode.value)]
 
     async def current_sirens(self) -> List[Siren]:
         return [

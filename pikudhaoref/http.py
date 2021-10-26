@@ -6,7 +6,7 @@ import aiohttp
 import asyncio
 
 
-__all__ = ("HTTPClient", "SyncHTTPClient", "ASyncHTTPClient")
+__all__ = ("HTTPClient", "SyncHTTPClient", "AsyncHTTPClient")
 
 
 class HTTPClient(ABC):
@@ -17,7 +17,7 @@ class HTTPClient(ABC):
     __slots__ = ("session",)
 
     @abstractmethod
-    def get_history(self) -> List[dict]:
+    def get_history(self, mode: int) -> List[dict]:
         """
         |maybecoro|
 
@@ -43,15 +43,10 @@ class SyncHTTPClient(HTTPClient):
     def __init__(self, session: requests.Session = None):
         self.session = session or requests.Session()
 
-    def get_history(self) -> List[dict]:
-        website_content = self.session.get(
-            "https://www.oref.org.il/WarningMessages/History/AlertsHistory.json"
-        ).text
-
-        if website_content == "\r\n":
-            return []
-
-        return json.loads(website_content)
+    def get_history(self, mode: int) -> List[dict]:
+        return json.loads(self.session.get(
+            f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode={mode}"
+        ).text)
 
     def get_current_sirens(self) -> List[str]:
         website_content = self.session.get(
@@ -65,23 +60,19 @@ class SyncHTTPClient(HTTPClient):
         return json.loads(website_content)["data"] if website_content != "" else []
 
 
-class ASyncHTTPClient(HTTPClient):
+class AsyncHTTPClient(HTTPClient):
     def __init__(
         self, session: aiohttp.ClientSession = None, loop: asyncio.BaseEventLoop = None
     ):
         self.session = session or aiohttp.ClientSession(loop=loop)
 
-    async def get_history(self) -> List[dict]:
+    async def get_history(self, mode: int) -> List[dict]:
+        # https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&fromDate=12.10.2021&toDate=26.10.2021&mode=0
         r = await self.session.get(
-            "https://www.oref.org.il/WarningMessages/History/AlertsHistory.json"
+            f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode={mode}"
         )
 
-        website_content = await r.text()
-
-        if website_content == "\r\n":
-            return []
-
-        return json.loads(website_content)
+        return json.loads(await r.text())
 
     async def get_current_sirens(self) -> List[str]:
         r = await self.session.get(

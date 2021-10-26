@@ -3,8 +3,8 @@ import pikudhaoref
 
 
 async def run(loop):
-    async with pikudhaoref.ASyncClient(update_interval=2, loop=loop) as p:
-        print(await p.history())
+    async with pikudhaoref.AsyncClient(update_interval=2, loop=loop) as p:
+        print(await p.get_history())
         print(await p.current_sirens())
 
 
