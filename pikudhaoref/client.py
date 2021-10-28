@@ -20,7 +20,7 @@ class SyncClient(EventManager):
 
     __slots__ = ("closed", "http", "update_interval", "_known_sirens")
 
-    def __init__(self, update_interval: Union[int, float] = 2):
+    def __init__(self, update_interval: Union[int, float] = 2, proxy: str = None):
         """
         :param Union[int, float] update_interval: The update interval of the client.
         """
@@ -28,7 +28,7 @@ class SyncClient(EventManager):
         super().__init__()
 
         self.closed = False
-        self.http = SyncHTTPClient()
+        self.http = SyncHTTPClient(proxy=proxy)
 
         self.update_interval = update_interval
         self._known_sirens = []
@@ -79,7 +79,7 @@ class AsyncClient(EventManager):
     __slots__ = ("closed", "http", "update_interval", "_known_sirens", "loop")
 
     def __init__(
-        self, update_interval: Union[int, float] = 2, loop: asyncio.BaseEventLoop = None
+        self, update_interval: Union[int, float] = 2, loop: asyncio.BaseEventLoop = None, proxy: str = None
     ):
         """
         :param Union[int, float] update_interval: The update interval of the client.
@@ -89,7 +89,7 @@ class AsyncClient(EventManager):
 
         self.loop = loop or asyncio.get_event_loop()
         self.closed = False
-        self.http = AsyncHTTPClient(loop=loop)
+        self.http = AsyncHTTPClient(loop=loop, proxy=proxy)
 
         self.update_interval = update_interval
         self._known_sirens = []
