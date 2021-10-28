@@ -138,7 +138,14 @@ class Client(ABC, EventManager):
     Represents a client
     """
 
-    __slots__ = ("closed", "http", "update_interval", "_known_sirens", "city_cache", "_initialized")
+    __slots__ = (
+        "closed",
+        "http",
+        "update_interval",
+        "_known_sirens",
+        "city_cache",
+        "_initialized",
+    )
 
     def get_city(self, city_name: str) -> City | str:
         # Get from city cache

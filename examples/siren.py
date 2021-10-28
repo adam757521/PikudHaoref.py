@@ -6,14 +6,7 @@ import pikudhaoref
 client = pikudhaoref.SyncClient(update_interval=2)
 
 history_range = client.get_history(
-    date_range=pikudhaoref.Range(
-        datetime(
-            year=2014,
-            month=7,
-            day=24
-        ),
-        datetime.now()
-    )
+    date_range=pikudhaoref.Range(datetime(year=2014, month=7, day=24), datetime.now())
 )
 history_month = client.get_history(mode=pikudhaoref.HistoryMode.LAST_MONTH)
 

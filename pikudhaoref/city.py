@@ -71,7 +71,11 @@ class City:
                 [
                     x
                     for x in city_data
-                    if any(city_name.lower() in name.lower() for key, name in x.items() if key in city_keys)
+                    if any(
+                        city_name.lower() in name.lower()
+                        for key, name in x.items()
+                        if key in city_keys
+                    )
                     # Uses this logic because pikudhaoref has changed city identifiers multiple times.
                     # A lot of old cities will not be detected.
                 ]

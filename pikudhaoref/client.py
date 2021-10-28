@@ -22,7 +22,14 @@ class SyncClient(Client):
     Represents a sync pikudhaoref client.
     """
 
-    __slots__ = ("closed", "http", "update_interval", "_known_sirens", "city_cache", "_initialized")
+    __slots__ = (
+        "closed",
+        "http",
+        "update_interval",
+        "_known_sirens",
+        "city_cache",
+        "_initialized",
+    )
 
     def __init__(self, update_interval: Union[int, float] = 2, proxy: str = None):
         """
@@ -56,15 +63,15 @@ class SyncClient(Client):
         self.closed = True
         self.http.session.close()
 
-    def get_history(self, mode: HistoryMode = HistoryMode.TODAY, date_range: Range = None) -> List[Siren]:
+    def get_history(
+        self, mode: HistoryMode = HistoryMode.TODAY, date_range: Range = None
+    ) -> List[Siren]:
         if date_range:
             sirens = self.http.get_range_history(date_range.start, date_range.end)
         else:
             sirens = self.http.get_history(mode.value)
 
-        return [
-            Siren.from_raw(x) for x in sirens
-        ]
+        return [Siren.from_raw(x) for x in sirens]
 
     @property
     def current_sirens(self) -> List[Siren]:
@@ -140,15 +147,15 @@ class AsyncClient(Client):
         self.closed = True
         await self.http.session.close()
 
-    async def get_history(self, mode: HistoryMode = HistoryMode.TODAY, range_: Range = None) -> List[Siren]:
+    async def get_history(
+        self, mode: HistoryMode = HistoryMode.TODAY, range_: Range = None
+    ) -> List[Siren]:
         if range_:
             sirens = await self.http.get_range_history(range_.start, range_.end)
         else:
             sirens = await self.http.get_history(mode.value)
 
-        return [
-            Siren.from_raw(x) for x in sirens
-        ]
+        return [Siren.from_raw(x) for x in sirens]
 
     async def current_sirens(self) -> List[Siren]:
         return [

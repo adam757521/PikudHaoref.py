@@ -35,5 +35,6 @@ class Siren:
         date = datetime.strptime(raw["datetime"], "%Y-%m-%dT%H:%M:%S")
 
         return cls(
-            raw["data"], israel_timezone.localize(date).astimezone(pytz.utc),
+            raw["data"],
+            israel_timezone.localize(date).astimezone(pytz.utc),
         )
