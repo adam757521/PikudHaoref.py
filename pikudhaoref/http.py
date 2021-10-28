@@ -1,137 +1,16 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional, TYPE_CHECKING
+from typing import List, Dict, Any, TYPE_CHECKING
 import requests
-import json
 import aiohttp
 import asyncio
 
-from .exceptions import AccessDenied
+from .abc import HTTPClient
 
 if TYPE_CHECKING:
     from datetime import datetime
 
-__all__ = ("HTTPClient", "SyncHTTPClient", "AsyncHTTPClient")
-
-
-class HTTPClient(ABC):
-    """
-    Represents a HTTP client.
-    """
-
-    __slots__ = ("session", "city_data", "proxy")
-
-    @staticmethod
-    def format_datetime(date: datetime) -> str:
-        """
-        Formats the datetime.
-
-        :param datetime date: The datetime.
-        :return: The formatted datetime
-        :rtype: str
-        """
-
-        return date.strftime("%d.%m.%Y")
-
-    @staticmethod
-    def parse_response(response: str) -> Any:
-        """
-        Parses the API response.
-
-        :param str response: The response.
-        :raises: AccessDenied: You cannot access the pikudhaoref API from outside Israel.
-        :return: The parsed response.
-        :rtype: Optional[Dict]
-        """
-
-        if "Access Denied" in response:
-            raise AccessDenied(
-                "You cannot access the pikudhaoref API from outside Israel."
-            )
-
-        if response == "":  # ...
-            return {}
-
-        return json.loads(response)
-
-    def request(self, method: str, url: str, headers: Dict[str, str] = None) -> Any:
-        """
-        |maybecoro|
-
-        Sends a request to the URL with the method.
-
-        :param str method: The method.
-        :param Dict[str, str] headers: The headers.
-        :param str url: The URL.
-        :return: The parsed response.
-        :rtype: Optional[Dict]
-        """
-
-    @staticmethod
-    def _format_city_data(dictionary: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """
-        Formats the city data.
-
-        :param Dict[str, Any] dictionary: The dictionary.
-        :return: The formatted city data.
-        :rtype: List[Dict[str, Any]]
-        """
-
-        areas = dictionary["areas"]
-        cities = list(dictionary["cities"].values())
-
-        for city in cities:
-            city.pop("id")
-            city["area"] = areas[str(city["area"])]
-
-        return cities
-
-    @abstractmethod
-    def initialize_city_data(self) -> None:
-        """
-        |maybecoro|
-
-        Initializes the city data.
-
-        :return: None
-        :rtype: None
-        """
-
-    @abstractmethod
-    def get_history(self, mode: int) -> List[dict]:
-        """
-        |maybecoro|
-
-        Returns the history of sirens in the specific mode.
-
-        :param int mode: The mode.
-        :return: The list of sirens.
-        :rtype: List[dict]
-        """
-
-    def get_range_history(self, start: datetime, end: datetime) -> List[dict]:
-        """
-        |maybecoro|
-
-        Returns the history of sirens in the range.
-
-        :param datetime start: The start.
-        :param datetime end: The end.
-        :return: The list of sirens.
-        :rtype: List[dict]
-        """
-
-    @abstractmethod
-    def get_current_sirens(self) -> List[str]:
-        """
-        |maybecoro|
-
-        Returns the current sirens.
-
-        :return: The list of city names.
-        :rtype: List[str]
-        """
+__all__ = ("SyncHTTPClient", "AsyncHTTPClient")
 
 
 class SyncHTTPClient(HTTPClient):

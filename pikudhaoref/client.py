@@ -6,8 +6,7 @@ from datetime import datetime
 from threading import Thread
 from typing import Union, List, TYPE_CHECKING
 
-from .city import City
-from .base import EventManager
+from .abc import Client
 from .enums import HistoryMode
 from .http import SyncHTTPClient, AsyncHTTPClient
 from .siren import Siren
@@ -18,7 +17,7 @@ if TYPE_CHECKING:
 __all__ = ("SyncClient", "AsyncClient")
 
 
-class SyncClient(EventManager):
+class SyncClient(Client):
     """
     Represents a sync pikudhaoref client.
     """
@@ -56,15 +55,6 @@ class SyncClient(EventManager):
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.closed = True
         self.http.session.close()
-
-    def get_city(self, city_name: str) -> City | str:
-        # Get from city cache
-        for city in self.city_cache:
-            if city_name in city.name.languages:
-                return city
-
-        # Create an instance
-        return City.from_city_name(city_name, self.http.city_data)
 
     def get_history(self, mode: HistoryMode = HistoryMode.TODAY, date_range: Range = None) -> List[Siren]:
         if date_range:
@@ -104,12 +94,12 @@ class SyncClient(EventManager):
                 self._known_sirens = []
 
 
-class AsyncClient(EventManager):
+class AsyncClient(Client):
     """
     Represents an async pikudhaoref client.
     """
 
-    __slots__ = ("closed", "http", "update_interval", "_known_sirens", "loop", "_initialized", "city_cache")
+    __slots__ = ("loop",)
 
     def __init__(
         self,
@@ -133,15 +123,6 @@ class AsyncClient(EventManager):
         self._known_sirens = []
 
         loop.create_task(self._handle_sirens())
-
-    def get_city(self, city_name: str) -> City | str:
-        # Get from city cache
-        for city in self.city_cache:
-            if city_name in city.name.languages:
-                return city
-
-        # Create an instance
-        return City.from_city_name(city_name, self.http.city_data)
 
     async def initialize(self):
         if self._initialized:
