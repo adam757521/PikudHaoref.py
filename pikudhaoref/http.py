@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional, Union, TYPE_CHECKING
+from typing import List, Dict, Any, Optional, TYPE_CHECKING
 import requests
 import json
 import aiohttp
 import asyncio
 
 from .exceptions import AccessDenied
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 __all__ = ("HTTPClient", "SyncHTTPClient", "AsyncHTTPClient")
 
@@ -16,6 +21,18 @@ class HTTPClient(ABC):
     """
 
     __slots__ = ("session", "city_data", "proxy")
+
+    @staticmethod
+    def format_datetime(date: datetime) -> str:
+        """
+        Formats the datetime.
+
+        :param datetime date: The datetime.
+        :return: The formatted datetime
+        :rtype: str
+        """
+
+        return date.strftime("%d.%m.%Y")
 
     @staticmethod
     def parse_response(response: str) -> Any:
@@ -86,8 +103,21 @@ class HTTPClient(ABC):
         """
         |maybecoro|
 
-        Returns the history of sirens in the last 24 hours.
+        Returns the history of sirens in the specific mode.
 
+        :param int mode: The mode.
+        :return: The list of sirens.
+        :rtype: List[dict]
+        """
+
+    def get_range_history(self, start: datetime, end: datetime) -> List[dict]:
+        """
+        |maybecoro|
+
+        Returns the history of sirens in the range.
+
+        :param datetime start: The start.
+        :param datetime end: The end.
         :return: The list of sirens.
         :rtype: List[dict]
         """
@@ -131,6 +161,15 @@ class SyncHTTPClient(HTTPClient):
             f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode={mode}",
         )
 
+    def get_range_history(self, start: datetime, end: datetime) -> List[dict]:
+        start = self.format_datetime(start)
+        end = self.format_datetime(end)
+
+        return self.request(
+            "GET",
+            f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode=0&fromDate={start}&toDate={end}",
+        )
+
     def get_current_sirens(self) -> List[str]:
         headers = {
             "X-Requested-With": "XMLHttpRequest",
@@ -172,10 +211,18 @@ class AsyncHTTPClient(HTTPClient):
         )
 
     async def get_history(self, mode: int) -> List[dict]:
-        # https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&fromDate=12.10.2021&toDate=26.10.2021&mode=0
         return await self.request(
             "GET",
             f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode={mode}",
+        )
+
+    async def get_range_history(self, start: datetime, end: datetime):
+        start = self.format_datetime(start)
+        end = self.format_datetime(end)
+
+        return await self.request(
+            "GET",
+            f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode=0&fromDate={start}&toDate={end}",
         )
 
     async def get_current_sirens(self) -> List[str]:

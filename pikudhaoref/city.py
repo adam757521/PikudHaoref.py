@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List, Union
 
 __all__ = ("LanguageRepresentation", "CityName", "CityZone", "City")
 
@@ -21,6 +21,10 @@ class LanguageRepresentation:
 
     def __str__(self):
         return self.en
+
+    @property
+    def languages(self) -> List[str]:
+        return [self.he, self.en, self.ru, self.ar, self.es]
 
 
 class CityName(LanguageRepresentation):
@@ -50,15 +54,15 @@ class City:
     @classmethod
     def from_city_name(
         cls, city_name: str, city_data: List[Dict[str, Any]]
-    ) -> Optional[City]:
+    ) -> Union[City, str]:
         """
         Returns a CityInformation object from a city name.
         The city name can be in hebrew, arabic, english, russian or spanish.
 
         :param List[Dict[str, Any]] city_data: The city data to get the city from.
         :param str city_name: The city name.
-        :return: The city if applicable.
-        :rtype: Optional[City]
+        :return: The city or the city_name (str) if the city cannot be found (old cities).
+        :rtype: Union[City, str]
         """
 
         city_keys = ["he", "en", "ar", "ru", "es"]
@@ -67,8 +71,9 @@ class City:
                 [
                     x
                     for x in city_data
-                    if city_name.lower()
-                    in [name.lower() for key, name in x.items() if key in city_keys]
+                    if any(city_name.lower() in name.lower() for key, name in x.items() if key in city_keys)
+                    # Uses this logic because pikudhaoref has changed city identifiers multiple times.
+                    # A lot of old cities will not be detected.
                 ]
             ),
             None,
@@ -76,6 +81,8 @@ class City:
 
         if city_dict:
             return cls.from_dict(city_dict)
+        else:
+            return city_name  # In case the city name is not in the city list.
 
     @classmethod
     def from_dict(cls, dictionary: Dict[str, Any]) -> City:

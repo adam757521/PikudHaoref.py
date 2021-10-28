@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 import asyncio
 import time
 from datetime import datetime
 from threading import Thread
-from typing import Union, List
+from typing import Union, List, TYPE_CHECKING
 
 from .city import City
 from .base import EventManager
 from .enums import HistoryMode
 from .http import SyncHTTPClient, AsyncHTTPClient
 from .siren import Siren
+
+if TYPE_CHECKING:
+    from .range import Range
 
 __all__ = ("SyncClient", "AsyncClient")
 
@@ -18,7 +23,7 @@ class SyncClient(EventManager):
     Represents a sync pikudhaoref client.
     """
 
-    __slots__ = ("closed", "http", "update_interval", "_known_sirens")
+    __slots__ = ("closed", "http", "update_interval", "_known_sirens", "city_cache", "_initialized")
 
     def __init__(self, update_interval: Union[int, float] = 2, proxy: str = None):
         """
@@ -32,8 +37,18 @@ class SyncClient(EventManager):
 
         self.update_interval = update_interval
         self._known_sirens = []
+        self.city_cache = []
+        self._initialized = False
+        self.initialize()
 
         Thread(target=self._handle_sirens, daemon=True).start()
+
+    def initialize(self):
+        if not self._initialized:
+            for city in self.http.city_data:
+                self.city_cache.append(self.get_city(city["he"]))
+
+            self._initialized = True
 
     def __enter__(self):
         return self
@@ -42,20 +57,35 @@ class SyncClient(EventManager):
         self.closed = True
         self.http.session.close()
 
-    def get_history(self, mode: HistoryMode = HistoryMode.TODAY) -> List[Siren]:
+    def get_city(self, city_name: str) -> City | str:
+        # Get from city cache
+        for city in self.city_cache:
+            if city_name in city.name.languages:
+                return city
+
+        # Create an instance
+        return City.from_city_name(city_name, self.http.city_data)
+
+    def get_history(self, mode: HistoryMode = HistoryMode.TODAY, date_range: Range = None) -> List[Siren]:
+        if date_range:
+            sirens = self.http.get_range_history(date_range.start, date_range.end)
+        else:
+            sirens = self.http.get_history(mode.value)
+
         return [
-            Siren.from_raw(x, self.http.city_data)
-            for x in self.http.get_history(mode.value)
+            Siren.from_raw(x) for x in sirens
         ]
 
     @property
     def current_sirens(self) -> List[Siren]:
         return [
-            Siren(City.from_city_name(x, self.http.city_data), datetime.utcnow())
+            Siren(self.get_city(x), datetime.utcnow())
             for x in self.http.get_current_sirens()
         ]
 
     def _handle_sirens(self):
+        self.initialize()
+
         while not self.closed:
             time.sleep(self.update_interval)
             cities = self.http.get_current_sirens()
@@ -79,7 +109,7 @@ class AsyncClient(EventManager):
     Represents an async pikudhaoref client.
     """
 
-    __slots__ = ("closed", "http", "update_interval", "_known_sirens", "loop")
+    __slots__ = ("closed", "http", "update_interval", "_known_sirens", "loop", "_initialized", "city_cache")
 
     def __init__(
         self,
@@ -97,13 +127,30 @@ class AsyncClient(EventManager):
         self.closed = False
         self.http = AsyncHTTPClient(loop=loop, proxy=proxy)
 
+        self._initialized = False
+        self.city_cache = []
         self.update_interval = update_interval
         self._known_sirens = []
 
         loop.create_task(self._handle_sirens())
 
+    def get_city(self, city_name: str) -> City | str:
+        # Get from city cache
+        for city in self.city_cache:
+            if city_name in city.name.languages:
+                return city
+
+        # Create an instance
+        return City.from_city_name(city_name, self.http.city_data)
+
     async def initialize(self):
-        await self.http.initialize_city_data()
+        if self._initialized:
+            await self.http.initialize_city_data()
+
+            for city in self.http.city_data:
+                self.city_cache.append(self.get_city(city["he"]))
+
+            self._initialized = False
 
     async def __aenter__(self):
         return self
@@ -112,20 +159,24 @@ class AsyncClient(EventManager):
         self.closed = True
         await self.http.session.close()
 
-    async def get_history(self, mode: HistoryMode = HistoryMode.TODAY) -> List[Siren]:
+    async def get_history(self, mode: HistoryMode = HistoryMode.TODAY, range_: Range = None) -> List[Siren]:
+        if range_:
+            sirens = await self.http.get_range_history(range_.start, range_.end)
+        else:
+            sirens = await self.http.get_history(mode.value)
+
         return [
-            Siren.from_raw(x, self.http.city_data)
-            for x in await self.http.get_history(mode.value)
+            Siren.from_raw(x) for x in sirens
         ]
 
     async def current_sirens(self) -> List[Siren]:
         return [
-            Siren(City.from_city_name(x, self.http.city_data), datetime.utcnow())
+            Siren(self.get_city(x), datetime.utcnow())
             for x in await self.http.get_current_sirens()
         ]
 
     async def _handle_sirens(self):
-        await self.http.initialize_city_data()
+        await self.initialize()
 
         while not self.closed:
             await asyncio.sleep(self.update_interval)
