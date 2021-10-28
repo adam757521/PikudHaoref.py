@@ -33,7 +33,7 @@ class SyncClient(EventManager):
         self.update_interval = update_interval
         self._known_sirens = []
 
-        Thread(target=self._handle_sirens).start()
+        Thread(target=self._handle_sirens, daemon=True).start()
 
     def __enter__(self):
         return self

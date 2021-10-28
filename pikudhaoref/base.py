@@ -1,5 +1,7 @@
 from typing import Callable
 
+__all__ = ("EventManager",)
+
 
 class EventManager:
     """

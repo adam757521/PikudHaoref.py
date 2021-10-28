@@ -14,3 +14,7 @@ def on_siren(sirens):
 @client.event()
 def on_siren_end(sirens):
     print(f"Sirens {sirens} have ended.")
+
+
+while True:
+    pass  # To make sure the script doesnt stop
