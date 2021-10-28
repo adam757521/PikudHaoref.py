@@ -29,7 +29,9 @@ class HTTPClient(ABC):
         """
 
         if "Access Denied" in response:
-            raise AccessDenied("You cannot access the pikudhaoref API from outside Israel.")
+            raise AccessDenied(
+                "You cannot access the pikudhaoref API from outside Israel."
+            )
 
         if response == "":  # ...
             return {}
@@ -114,15 +116,20 @@ class SyncHTTPClient(HTTPClient):
             method,
             url,
             headers=headers or {},
-            proxies=self.proxy and {"http": f"http://{self.proxy}/"}
+            proxies=self.proxy and {"http": f"http://{self.proxy}/"},
         )
         return self.parse_response(r.text)
 
     def initialize_city_data(self) -> None:
-        self.city_data = self._format_city_data(self.request("GET", "https://www.tzevaadom.co.il/static/cities.json"))
+        self.city_data = self._format_city_data(
+            self.request("GET", "https://www.tzevaadom.co.il/static/cities.json")
+        )
 
     def get_history(self, mode: int) -> List[dict]:
-        return self.request("GET", f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode={mode}")
+        return self.request(
+            "GET",
+            f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode={mode}",
+        )
 
     def get_current_sirens(self) -> List[str]:
         headers = {
@@ -133,24 +140,29 @@ class SyncHTTPClient(HTTPClient):
         return self.request(
             "GET",
             "https://www.oref.org.il/WarningMessages/Alert/alerts.json",
-            headers=headers
+            headers=headers,
         ).get("data", [])
 
 
 class AsyncHTTPClient(HTTPClient):
     def __init__(
-        self, session: aiohttp.ClientSession = None, loop: asyncio.BaseEventLoop = None, proxy: str = None
+        self,
+        session: aiohttp.ClientSession = None,
+        loop: asyncio.BaseEventLoop = None,
+        proxy: str = None,
     ):
         self.session = session or aiohttp.ClientSession(loop=loop)
         self.proxy = proxy
         self.city_data = {}
 
-    async def request(self, method: str, url: str, headers: Dict[str, str] = None) -> Any:
+    async def request(
+        self, method: str, url: str, headers: Dict[str, str] = None
+    ) -> Any:
         r = await self.session.request(
             method,
             url,
             headers=headers or {},
-            proxy=self.proxy and f"http://{self.proxy}/"
+            proxy=self.proxy and f"http://{self.proxy}/",
         )
         return self.parse_response(await r.text())
 
@@ -163,7 +175,7 @@ class AsyncHTTPClient(HTTPClient):
         # https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&fromDate=12.10.2021&toDate=26.10.2021&mode=0
         return await self.request(
             "GET",
-            f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode={mode}"
+            f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode={mode}",
         )
 
     async def get_current_sirens(self) -> List[str]:
@@ -172,8 +184,10 @@ class AsyncHTTPClient(HTTPClient):
             "Referer": "https://www.oref.org.il/",
         }
 
-        return (await self.request(
-            "GET",
-            "https://www.oref.org.il/WarningMessages/Alert/alerts.json",
-            headers=headers
-        )).get("data", [])
+        return (
+            await self.request(
+                "GET",
+                "https://www.oref.org.il/WarningMessages/Alert/alerts.json",
+                headers=headers,
+            )
+        ).get("data", [])

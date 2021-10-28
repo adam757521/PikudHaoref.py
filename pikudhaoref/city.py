@@ -48,7 +48,9 @@ class City:
     lng: float
 
     @classmethod
-    def from_city_name(cls, city_name: str, city_data: List[Dict[str, Any]]) -> Optional[City]:
+    def from_city_name(
+        cls, city_name: str, city_data: List[Dict[str, Any]]
+    ) -> Optional[City]:
         """
         Returns a CityInformation object from a city name.
         The city name can be in hebrew, arabic, english, russian or spanish.

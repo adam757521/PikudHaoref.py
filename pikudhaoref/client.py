@@ -43,7 +43,10 @@ class SyncClient(EventManager):
         self.http.session.close()
 
     def get_history(self, mode: HistoryMode = HistoryMode.TODAY) -> List[Siren]:
-        return [Siren.from_raw(x, self.http.city_data) for x in self.http.get_history(mode.value)]
+        return [
+            Siren.from_raw(x, self.http.city_data)
+            for x in self.http.get_history(mode.value)
+        ]
 
     @property
     def current_sirens(self) -> List[Siren]:
@@ -79,7 +82,10 @@ class AsyncClient(EventManager):
     __slots__ = ("closed", "http", "update_interval", "_known_sirens", "loop")
 
     def __init__(
-        self, update_interval: Union[int, float] = 2, loop: asyncio.BaseEventLoop = None, proxy: str = None
+        self,
+        update_interval: Union[int, float] = 2,
+        loop: asyncio.BaseEventLoop = None,
+        proxy: str = None,
     ):
         """
         :param Union[int, float] update_interval: The update interval of the client.
@@ -107,7 +113,10 @@ class AsyncClient(EventManager):
         await self.http.session.close()
 
     async def get_history(self, mode: HistoryMode = HistoryMode.TODAY) -> List[Siren]:
-        return [Siren.from_raw(x, self.http.city_data) for x in await self.http.get_history(mode.value)]
+        return [
+            Siren.from_raw(x, self.http.city_data)
+            for x in await self.http.get_history(mode.value)
+        ]
 
     async def current_sirens(self) -> List[Siren]:
         return [
