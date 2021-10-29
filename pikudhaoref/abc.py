@@ -6,10 +6,10 @@ import json
 
 from .city import City
 from .base import EventManager
+from .exceptions import AccessDenied
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from .exceptions import AccessDenied
 
 __all__ = ("HTTPClient", "Client")
 

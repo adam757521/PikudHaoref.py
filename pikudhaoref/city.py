@@ -150,8 +150,8 @@ class City:
 
         if city_dict:
             return cls.from_dict(city_dict)
-        else:
-            return city_name  # In case the city name is not in the city list.
+
+        return city_name  # In case the city name is not in the city list.
 
     @classmethod
     def from_dict(cls, dictionary: Dict[str, Any]) -> City:
