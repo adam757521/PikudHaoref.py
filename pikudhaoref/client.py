@@ -85,20 +85,25 @@ class SyncClient(Client):
 
         while not self.closed:
             time.sleep(self.update_interval)
-            cities = self.http.get_current_sirens()
+            sirens = self.current_sirens
 
-            if cities:
-                new_cities = [city for city in cities if city not in self._known_sirens]
-                if new_cities:
-                    self.call_sync_event("on_siren", new_cities)
+            new_sirens = [
+                siren
+                for siren in sirens
+                if siren.city not in [siren.city for siren in self._known_sirens]
+            ]
+            if new_sirens:
+                self.call_sync_event("on_siren", new_sirens)
 
-                ended_sirens = [x for x in self._known_sirens if x not in cities]
-                if ended_sirens:
-                    self.call_sync_event("on_siren_end", ended_sirens)
+            ended_sirens = [
+                x
+                for x in self._known_sirens
+                if x.city not in [siren.city for siren in sirens]
+            ]
+            if ended_sirens:
+                self.call_sync_event("on_siren_end", ended_sirens)
 
-                self._known_sirens = cities
-            else:
-                self._known_sirens = []
+            self._known_sirens = sirens
 
 
 class AsyncClient(Client):
@@ -111,7 +116,7 @@ class AsyncClient(Client):
     def __init__(
         self,
         update_interval: Union[int, float] = 2,
-        loop: asyncio.BaseEventLoop = None,
+        loop: asyncio.AbstractEventLoop = None,
         proxy: str = None,
     ):
         """
@@ -132,7 +137,7 @@ class AsyncClient(Client):
         loop.create_task(self._handle_sirens())
 
     async def initialize(self):
-        if self._initialized:
+        if not self._initialized:
             await self.http.initialize_city_data()
 
             for city in self.http.city_data:
@@ -168,17 +173,22 @@ class AsyncClient(Client):
 
         while not self.closed:
             await asyncio.sleep(self.update_interval)
-            cities = await self.http.get_current_sirens()
+            sirens = await self.current_sirens()
 
-            if cities:
-                new_cities = [city for city in cities if city not in self._known_sirens]
-                if new_cities:
-                    await self.call_async_event("on_siren", new_cities)
+            new_sirens = [
+                siren
+                for siren in sirens
+                if siren.city not in [siren.city for siren in self._known_sirens]
+            ]
+            if new_sirens:
+                await self.call_async_event("on_siren", new_sirens)
 
-                ended_sirens = [x for x in self._known_sirens if x not in cities]
-                if ended_sirens:
-                    await self.call_async_event("on_siren_end", ended_sirens)
+            ended_sirens = [
+                x
+                for x in self._known_sirens
+                if x.city not in [siren.city for siren in sirens]
+            ]
+            if ended_sirens:
+                await self.call_async_event("on_siren_end", ended_sirens)
 
-                self._known_sirens = cities
-            else:
-                self._known_sirens = []
+            self._known_sirens = sirens
