@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Any, List, Union
 
+from .enums import MatchMode
+
 __all__ = ("LanguageRepresentation", "CityName", "CityZone", "CityCountdown", "City")
 
 
@@ -116,6 +118,24 @@ class City:
     lat: float
     lng: float
 
+    @staticmethod
+    def _city_name_match(city_name: str, city_data: Dict[str, Any], match_mode: MatchMode) -> bool:
+        city_keys = ["he", "en", "ar", "ru", "es"]
+        city_names = [name for key, name in city_data.items() if key in city_keys]
+
+        for api_city_name in city_names:
+            matches = {
+                MatchMode.EXACT: city_name == api_city_name,
+                MatchMode.IN: city_name in api_city_name,
+            }
+
+            match = matches.get(match_mode)
+
+            if match:
+                return True
+
+        return False
+
     @classmethod
     def from_city_name(
         cls, city_name: str, city_data: List[Dict[str, Any]]
@@ -130,26 +150,16 @@ class City:
         :rtype: Union[City, str]
         """
 
-        city_keys = ["he", "en", "ar", "ru", "es"]
-        city_dict = next(
-            iter(
-                [
-                    x
-                    for x in city_data
-                    if any(
-                        city_name.lower() in name.lower()
-                        for key, name in x.items()
-                        if key in city_keys
-                    )
-                    # Uses this logic because pikudhaoref has changed city identifiers multiple times.
-                    # A lot of old cities will not be detected.
-                ]
-            ),
-            None,
-        )
+        priorities = [
+            [city for city in city_data if cls._city_name_match(city_name, city, mode)]
+            for mode in MatchMode
+        ]
 
-        if city_dict:
-            return cls.from_dict(city_dict)
+        for priority in priorities:
+            city_dict = next(iter(priority), None)
+
+            if city_dict:
+                return cls.from_dict(city_dict)
 
         return city_name  # In case the city name is not in the city list.
 
