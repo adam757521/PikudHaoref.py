@@ -22,14 +22,7 @@ class SyncClient(Client):
     Represents a sync pikudhaoref client.
     """
 
-    __slots__ = (
-        "closed",
-        "http",
-        "update_interval",
-        "_known_sirens",
-        "city_cache",
-        "_initialized",
-    )
+    __slots__ = ()
 
     def __init__(self, update_interval: Union[int, float] = 2, proxy: str = None):
         """
@@ -38,15 +31,15 @@ class SyncClient(Client):
 
         super().__init__()
 
-        self.closed = False
+        self.update_interval = update_interval
         self.http = SyncHTTPClient(proxy=proxy)
 
-        self.update_interval = update_interval
+        self._initialized = False
+        self.closed = False
         self._known_sirens = []
         self.city_cache = []
-        self._initialized = False
-        self.initialize()
 
+        self.initialize()
         Thread(target=self._handle_sirens, daemon=True).start()
 
     def initialize(self):
@@ -93,17 +86,19 @@ class SyncClient(Client):
                 if siren.city not in [siren.city for siren in self._known_sirens]
             ]
             if new_sirens:
+                self._known_sirens.extend(new_sirens)
                 self.call_sync_event("on_siren", new_sirens)
 
-            ended_sirens = [
-                x
-                for x in self._known_sirens
-                if x.city not in [siren.city for siren in sirens]
-            ]
-            if ended_sirens:
-                self.call_sync_event("on_siren_end", ended_sirens)
+            if not sirens:
+                ended_sirens = [
+                    x
+                    for x in self._known_sirens
+                    if x.city not in [siren.city for siren in sirens]
+                ]
+                if ended_sirens:
+                    self.call_sync_event("on_siren_end", ended_sirens)
 
-            self._known_sirens = sirens
+                self._known_sirens = []
 
 
 class AsyncClient(Client):
@@ -126,12 +121,12 @@ class AsyncClient(Client):
         super().__init__()
 
         self.loop = loop or asyncio.get_event_loop()
-        self.closed = False
+        self.update_interval = update_interval
         self.http = AsyncHTTPClient(loop=loop, proxy=proxy)
 
         self._initialized = False
+        self.closed = False
         self.city_cache = []
-        self.update_interval = update_interval
         self._known_sirens = []
 
         loop.create_task(self._handle_sirens())
@@ -181,14 +176,16 @@ class AsyncClient(Client):
                 if siren.city not in [siren.city for siren in self._known_sirens]
             ]
             if new_sirens:
+                self._known_sirens.extend(new_sirens)
                 await self.call_async_event("on_siren", new_sirens)
 
-            ended_sirens = [
-                x
-                for x in self._known_sirens
-                if x.city not in [siren.city for siren in sirens]
-            ]
-            if ended_sirens:
-                await self.call_async_event("on_siren_end", ended_sirens)
+            if not sirens:
+                ended_sirens = [
+                    x
+                    for x in self._known_sirens
+                    if x.city not in [siren.city for siren in sirens]
+                ]
+                if ended_sirens:
+                    await self.call_async_event("on_siren_end", ended_sirens)
 
-            self._known_sirens = sirens
+                self._known_sirens = []
