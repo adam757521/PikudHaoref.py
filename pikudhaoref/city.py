@@ -150,10 +150,20 @@ class City:
         :rtype: Union[City, str]
         """
 
+        city_dict = next(
+            (
+                city for city in city_data if cls._city_name_match(city_name, city, MatchMode.EXACT)
+            ),
+            None
+        )
+
+        if city_dict:
+            return cls.from_dict(city_dict)
+
         priorities = [
             [city for city in city_data if cls._city_name_match(city_name, city, mode)]
-            for mode in MatchMode
-        ]
+            for mode in MatchMode if mode != MatchMode.EXACT
+        ]  # Only use priorities if MatchMode.EXACT failed, to save time and memory.
 
         for priority in priorities:
             city_dict = next(iter(priority), None)

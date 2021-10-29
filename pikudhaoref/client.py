@@ -77,7 +77,7 @@ class SyncClient(Client):
     def current_sirens(self) -> List[Siren]:
         return [
             Siren(self.get_city(x), datetime.utcnow())
-            for x in self.http.get_current_sirens()
+            for x in self.remove_duplicates(self.http.get_current_sirens())
         ]
 
     def _handle_sirens(self):
@@ -165,7 +165,7 @@ class AsyncClient(Client):
     async def current_sirens(self) -> List[Siren]:
         return [
             Siren(self.get_city(x), datetime.utcnow())
-            for x in await self.http.get_current_sirens()
+            for x in self.remove_duplicates(await self.http.get_current_sirens())
         ]
 
     async def _handle_sirens(self):

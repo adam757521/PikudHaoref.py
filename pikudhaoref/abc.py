@@ -147,10 +147,22 @@ class Client(ABC, EventManager):
         "_initialized",
     )
 
+    @staticmethod
+    def remove_duplicates(list_: list) -> list:
+        """
+        Removes duplicate elements from the list.
+
+        :param list list_: The list.
+        :return: The removed duplicate list.
+        :rtype: list
+        """
+
+        return list(dict.fromkeys(list_))  # Nice little cheat
+
     def get_city(self, city_name: str) -> City | str:
         # Get from city cache
         for city in self.city_cache:
-            if city_name in city.name.languages:
+            if city_name == city or city_name in city.name.languages:
                 return city
 
         # Create an instance
