@@ -119,7 +119,9 @@ class City:
     lng: float
 
     @staticmethod
-    def _city_name_match(city_name: str, city_data: Dict[str, Any], match_mode: MatchMode) -> bool:
+    def _city_name_match(
+        city_name: str, city_data: Dict[str, Any], match_mode: MatchMode
+    ) -> bool:
         city_keys = ["he", "en", "ar", "ru", "es"]
         city_names = [name for key, name in city_data.items() if key in city_keys]
 
@@ -152,9 +154,11 @@ class City:
 
         city_dict = next(
             (
-                city for city in city_data if cls._city_name_match(city_name, city, MatchMode.EXACT)
+                city
+                for city in city_data
+                if cls._city_name_match(city_name, city, MatchMode.EXACT)
             ),
-            None
+            None,
         )
 
         if city_dict:
@@ -162,7 +166,8 @@ class City:
 
         priorities = [
             [city for city in city_data if cls._city_name_match(city_name, city, mode)]
-            for mode in MatchMode if mode != MatchMode.EXACT
+            for mode in MatchMode
+            if mode != MatchMode.EXACT
         ]  # Only use priorities if MatchMode.EXACT failed, to save time and memory.
 
         for priority in priorities:
