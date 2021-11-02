@@ -82,7 +82,7 @@ while True:
 TODO
 --------------
 
-- None
+- Fix unknown city system
 
 Known Issues
 --------------
