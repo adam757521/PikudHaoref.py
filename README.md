@@ -25,6 +25,9 @@ Features
 - Very easy to use and user-friendly.
 - Object Oriented.
 - Detect sirens in real time.
+- View city data (zone, name, countdown, location).
+- Supports many languages (English, Russian, Hebrew, Spanish, Arabic).
+- Both sync and async support.
 (MORE COMING SOON)
 
 **The pikudhaoref API is only accessible from Israel.**
@@ -87,7 +90,7 @@ TODO
 Known Issues
 --------------
 
-- Currently, None!
+- None
 
 **Incase you do find bugs, please create an issue or a PR.**
 
