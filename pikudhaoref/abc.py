@@ -166,4 +166,6 @@ class Client(ABC, EventManager):
                 return city
 
         # Create an instance
-        return City.from_city_name(city_name, self.http.city_data)
+        city = City.from_city_name(city_name, self.http.city_data)
+        self.city_cache.append(city)
+        return city

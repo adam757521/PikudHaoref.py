@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 import pytz
-from typing import Dict, TYPE_CHECKING
+from typing import Dict, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from .city import City
@@ -22,7 +22,7 @@ class Siren:
     datetime: datetime
 
     @classmethod
-    def from_raw(cls, raw: Dict[str, str]) -> Siren:
+    def from_raw(cls, raw: Dict[str, Any]) -> Siren:
         """
         Returns a Siren object from the dictionary.
 

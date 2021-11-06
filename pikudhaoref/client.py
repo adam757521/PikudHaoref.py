@@ -57,12 +57,16 @@ class SyncClient(Client):
         self.http.session.close()
 
     def get_history(
-        self, mode: HistoryMode = HistoryMode.TODAY, date_range: Range = None
+        self, mode: HistoryMode = HistoryMode.TODAY, date_range: Range = None, get_city: bool = False
     ) -> List[Siren]:
         if date_range:
             sirens = self.http.get_range_history(date_range.start, date_range.end)
         else:
             sirens = self.http.get_history(mode.value)
+
+        if get_city:
+            for siren in sirens:
+                siren["data"] = self.get_city(siren["data"])
 
         return [Siren.from_raw(x) for x in sirens]
 
@@ -148,12 +152,16 @@ class AsyncClient(Client):
         await self.http.session.close()
 
     async def get_history(
-        self, mode: HistoryMode = HistoryMode.TODAY, range_: Range = None
+        self, mode: HistoryMode = HistoryMode.TODAY, range_: Range = None, get_city: bool = False
     ) -> List[Siren]:
         if range_:
             sirens = await self.http.get_range_history(range_.start, range_.end)
         else:
             sirens = await self.http.get_history(mode.value)
+
+        if get_city:
+            for siren in sirens:
+                siren["data"] = self.get_city(siren["data"])
 
         return [Siren.from_raw(x) for x in sirens]
 

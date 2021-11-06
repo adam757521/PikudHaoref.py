@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union, Optional
 
 from .enums import MatchMode
 
@@ -15,11 +15,11 @@ class LanguageRepresentation:
     Meant to be inherited.
     """
 
-    he: str
-    en: str
-    ru: str
-    ar: str
-    es: str
+    he: Optional[str]
+    en: Optional[str]
+    ru: Optional[str]
+    ar: Optional[str]
+    es: Optional[str]
 
     def __str__(self):
         return self.en
@@ -176,12 +176,18 @@ class City:
             if city_dict:
                 return cls.from_dict(city_dict)
 
-        return city_name  # In case the city name is not in the city list.
+        return cls(
+            name=CityName(city_name, None, None, None, None),
+            zone=CityZone(None, None, None, None, None),
+            countdown=CityCountdown.from_seconds(0),
+            lat=0,
+            lng=0,
+        )  # In case the city name is not in the city list.
 
     @classmethod
     def from_dict(cls, dictionary: Dict[str, Any]) -> City:
         """
-        Returns a CityInformation from the dictionary.
+        Returns a City from the dictionary.
 
         :param Dict[str, Any] dictionary: The dictionary.
         :return: The city.

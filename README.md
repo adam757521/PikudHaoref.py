@@ -85,7 +85,7 @@ while True:
 TODO
 --------------
 
-- Fix unknown city system
+- None
 
 Known Issues
 --------------
