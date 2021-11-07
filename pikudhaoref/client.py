@@ -57,7 +57,10 @@ class SyncClient(Client):
         self.http.session.close()
 
     def get_history(
-        self, mode: HistoryMode = HistoryMode.TODAY, date_range: Range = None, get_city: bool = False
+        self,
+        mode: HistoryMode = HistoryMode.TODAY,
+        date_range: Range = None,
+        get_city: bool = False,
     ) -> List[Siren]:
         if date_range:
             sirens = self.http.get_range_history(date_range.start, date_range.end)
@@ -152,7 +155,10 @@ class AsyncClient(Client):
         await self.http.session.close()
 
     async def get_history(
-        self, mode: HistoryMode = HistoryMode.TODAY, range_: Range = None, get_city: bool = False
+        self,
+        mode: HistoryMode = HistoryMode.TODAY,
+        range_: Range = None,
+        get_city: bool = False,
     ) -> List[Siren]:
         if range_:
             sirens = await self.http.get_range_history(range_.start, range_.end)
