@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+from io import BytesIO
 from typing import List, Dict, Any, TYPE_CHECKING
 import requests
 import aiohttp
 import asyncio
 
+from .utils import create_map_url_from_cities
 from .abc import HTTPClient
 
 if TYPE_CHECKING:
+    from .city import City
     from datetime import datetime
 
 __all__ = ("SyncHTTPClient", "AsyncHTTPClient")
@@ -32,6 +35,14 @@ class SyncHTTPClient(HTTPClient):
     def initialize_city_data(self) -> None:
         self.city_data = self._format_city_data(
             self.request("GET", "https://www.tzevaadom.co.il/static/cities.json")
+        )
+
+    def create_map(self, cities: List[City], key: str = None) -> BytesIO:
+        return BytesIO(
+            self.session.request(
+                "GET",
+                create_map_url_from_cities(cities, key),
+            ).content
         )
 
     def get_history(self, mode: int) -> List[dict]:
@@ -102,6 +113,14 @@ class AsyncHTTPClient(HTTPClient):
         return await self.request(
             "GET",
             f"https://www.oref.org.il//Shared/Ajax/GetAlarmsHistory.aspx?lang=he&mode=0&fromDate={start}&toDate={end}",
+        )
+
+    async def create_map(self, cities: List[City], key: str = None) -> BytesIO:
+        return BytesIO(
+            await (await self.session.request(
+                "GET",
+                create_map_url_from_cities(cities, key),
+            )).read()
         )
 
     async def get_current_sirens(self) -> List[str]:

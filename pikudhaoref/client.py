@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import time
 from datetime import datetime
+from io import BytesIO
 from threading import Thread
 from typing import Union, List, TYPE_CHECKING
 
@@ -12,6 +13,7 @@ from .http import SyncHTTPClient, AsyncHTTPClient
 from .siren import Siren
 
 if TYPE_CHECKING:
+    from .city import City
     from .range import Range
 
 __all__ = ("SyncClient", "AsyncClient")
@@ -72,6 +74,9 @@ class SyncClient(Client):
                 siren["data"] = self.get_city(siren["data"])
 
         return [Siren.from_raw(x) for x in sirens]
+
+    def create_map(self, cities: List[City], key: str = None) -> BytesIO:
+        return self.http.create_map(cities, key)
 
     @property
     def current_sirens(self) -> List[Siren]:
@@ -176,6 +181,9 @@ class AsyncClient(Client):
             Siren(self.get_city(x), datetime.utcnow())
             for x in self.remove_duplicates(await self.http.get_current_sirens())
         ]
+
+    async def create_map(self, cities: List[City], key: str = None) -> BytesIO:
+        return await self.http.create_map(cities, key)
 
     async def _handle_sirens(self):
         await self.initialize()
