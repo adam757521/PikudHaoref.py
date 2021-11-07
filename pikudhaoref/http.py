@@ -117,10 +117,12 @@ class AsyncHTTPClient(HTTPClient):
 
     async def create_map(self, cities: List[City], key: str = None) -> BytesIO:
         return BytesIO(
-            await (await self.session.request(
-                "GET",
-                create_map_url_from_cities(cities, key),
-            )).read()
+            await (
+                await self.session.request(
+                    "GET",
+                    create_map_url_from_cities(cities, key),
+                )
+            ).read()
         )
 
     async def get_current_sirens(self) -> List[str]:
