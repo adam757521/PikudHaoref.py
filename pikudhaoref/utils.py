@@ -39,7 +39,7 @@ def create_marker_dict(
         },
         "geometry": {
             "type": "Point",
-            "coordinates": [lat, lng],
+            "coordinates": [lng, lat],
         },
     }
 
@@ -76,7 +76,7 @@ def create_map_url_from_cities(cities: List[City], access_token: str = None) -> 
             )
         )
 
-    locations = [(city.lat, city.lng) for city in cities]
+    locations = [(city.lng, city.lat) for city in cities]
     zoom_level, center = determine_zoom_level(locations)
 
     return create_map_url(

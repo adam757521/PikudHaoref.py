@@ -115,8 +115,8 @@ class City:
     name: CityName
     zone: CityZone
     countdown: CityCountdown
-    lng: float
     lat: float
+    lng: float
 
     @staticmethod
     def _city_name_match(
