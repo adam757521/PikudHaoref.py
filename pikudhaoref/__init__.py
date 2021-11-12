@@ -6,6 +6,6 @@ from .siren import Siren
 from .utils import create_map_url_from_cities
 
 __title__ = "pikudhaoref"
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 __author__ = "adam7100"
 __license__ = "MIT"
