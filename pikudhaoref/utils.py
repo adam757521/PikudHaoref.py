@@ -15,7 +15,7 @@ __all__ = (
     "create_map_url",
     "create_marker_dict",
     "determine_zoom_level",
-    "create_map_url_from_cities"
+    "create_map_url_from_cities",
 )
 
 DEFAULT_PUBLIC_MAPBOX_KEY = "pk.eyJ1IjoiYWRhbTcxMDAiLCJhIjoiY2t2cGVlNGRsNjJoNzJxb2t6Z2U1M3g0aCJ9.3VXThhkllBpccpMfLflN2A"
