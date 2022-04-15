@@ -49,10 +49,10 @@ class HTTPClient(ABC):
                 "You cannot access the pikudhaoref API from outside Israel."
             )
 
-        if response == "":  # ...
+        try:
+            return json.loads(response)
+        except json.decoder.JSONDecodeError:
             return {}
-
-        return json.loads(response)
 
     def request(self, method: str, url: str, headers: Dict[str, str] = None) -> Any:
         """
