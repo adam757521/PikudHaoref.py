@@ -32,7 +32,7 @@ class Siren:
         """
 
         israel_timezone = pytz.timezone("Israel")
-        date = datetime.strptime(raw["datetime"], "%Y-%m-%dT%H:%M:%S")
+        date = datetime.strptime(raw["alertDate"], "%Y-%m-%dT%H:%M:%S")
 
         return cls(
             raw["data"],
